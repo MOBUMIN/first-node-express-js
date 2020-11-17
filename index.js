@@ -28,6 +28,14 @@ app.get('/todos', (req, res)=>{
 
 app.get('/todos/:id', function(req,res){
     console.log('DB 정보 하나 GET!');
+    var result={};
+    var i = Object.keys(data.todos).length;
+    if(req.params.id > i){
+        result["success"] = 0;
+        result["error"] = "데이터 없음";
+        res.json(result);
+        return;
+    }
     res.json(data.todos[req.params.id-1]);
 });
 
@@ -62,10 +70,14 @@ app.post('/todos/', function(req,res){
         res.json(result);
         return;
     }
+    var comval = "false";
+    if(inputdata["completed"]){
+        comval = inputdata.completed;
+    }
     result["success"] = 1;
     var i = Object.keys(data.todos).length;
     data.todos[i]={
-        "id":i+1,"content":inputdata.content,"completed":false
+        "id":i+1,"content":inputdata.content,"completed":comval
     }
     fs.writeFileSync(dbFile,JSON.stringify(data));
     result["todos"] = data.todos[i];
